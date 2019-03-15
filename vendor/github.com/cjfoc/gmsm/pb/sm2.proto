@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+/*
+sm2非对称密钥操作
+*/
+package pb;
+
+
+message Sm2GenerateRequest {
+   bool ephemeral=1;
+}
+
+message Sm2GenerateResponse {
+  bytes label=1;
+  bytes D=2;
+  bytes X=3;
+  bytes Y=4;
+}
+
+message Sm2SignRequest {
+  bytes label=1;
+  bytes msg =2;
+}
+
+message Sm2SignResponse {
+  bytes dst =1;
+}
+
+message Sm2VerifyRequest {
+  bytes label=1;
+  bytes msg =2;
+  bytes dst =3;
+}
+
+message Sm2VerifyResponse {
+  bool valid =1;
+}
+
+message Sm2EncryptRequest {
+  bytes label=1;
+  bytes msg =2;
+}
+
+message Sm2EncryptResponse {
+  bytes dst =1;
+}
+
+message Sm2DecryptRequest {
+  bytes label=1;
+  bytes msg =2;
+}
+
+message Sm2DecryptResponse {
+  bytes dst =1;
+}
+
+message Sm2PublicKeyRequest {
+  bytes label=1;
+}
+
+message Sm2PublicKeyResponse {
+  bytes X=1;
+  bytes Y=2;
+}
+
+
+service Sm2Operate {
+  rpc Sm2Generate(Sm2GenerateRequest) returns (Sm2GenerateResponse) {}
+  rpc Sm2SignData(Sm2SignRequest) returns (Sm2SignResponse){}
+  rpc Sm2VerifyData(Sm2VerifyRequest) returns (Sm2VerifyResponse){}
+  rpc Sm2EncryptData(Sm2EncryptRequest) returns (Sm2EncryptResponse){}
+  rpc Sm2DecryptData(Sm2DecryptRequest) returns (Sm2DecryptResponse){}
+  rpc Sm2PublicKey(Sm2PublicKeyRequest) returns(Sm2PublicKeyResponse){}
+}

@@ -10,7 +10,7 @@ import (
 	reqContext "context"
 	"crypto/x509"
 	"time"
-
+	"github.com/tjfoc/gmtls/gmcredentials"
 	"github.com/pkg/errors"
 	"github.com/spf13/cast"
 	"google.golang.org/grpc"
@@ -83,7 +83,7 @@ func New(config fab.EndpointConfig, opts ...Option) (*Orderer, error) {
 			return verifier.VerifyPeerCertificate(rawCerts, verifiedChains)
 		}
 
-		grpcOpts = append(grpcOpts, grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)))
+		grpcOpts = append(grpcOpts, grpc.WithTransportCredentials(gmcredentials.NewTLS(tlsConfig)))
 	} else {
 		grpcOpts = append(grpcOpts, grpc.WithInsecure())
 	}

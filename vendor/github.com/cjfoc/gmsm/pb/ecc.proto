@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+/*
+ecc非对称密钥操作
+*/
+package pb;
+
+
+message EccGenerateRequest {
+   bool ephemeral=1;
+}
+
+message EccGenerateResponse {
+  bytes label=1;
+  bytes D=2;
+  bytes X=3;
+  bytes Y=4;
+}
+
+message EccSignRequest {
+  bytes label=1;
+  bytes msg =2;
+}
+
+message EccSignResponse {
+  bytes dst =1;
+}
+
+message EccVerifyRequest {
+  bytes label=1;
+  bytes msg =2;
+  bytes dst =3;
+}
+
+message EccVerifyResponse {
+  bool valid =1;
+}
+
+message EccEncryptRequest {
+  bytes label=1;
+  bytes msg =2;
+}
+
+message EccEncryptResponse {
+  bytes dst =1;
+}
+
+message EccDecryptRequest {
+  bytes label=1;
+  bytes msg =2;
+}
+
+message EccDecryptResponse {
+  bytes dst =1;
+}
+
+message EccPublicKeyRequest {
+  bytes label=1;
+}
+
+message EccPublicKeyResponse {
+  bytes X=1;
+  bytes Y=2;
+}
+
+
+service EccOperate {
+  rpc EccGenerate(EccGenerateRequest) returns (EccGenerateResponse) {}
+  rpc EccSignData(EccSignRequest) returns (EccSignResponse){}
+  rpc EccVerifyData(EccVerifyRequest) returns (EccVerifyResponse){}
+  rpc EccEncryptData(EccEncryptRequest) returns (EccEncryptResponse){}
+  rpc EccDecryptData(EccDecryptRequest) returns (EccDecryptResponse){}
+  rpc EccPublicKey(EccPublicKeyRequest) returns(EccPublicKeyResponse){}
+}

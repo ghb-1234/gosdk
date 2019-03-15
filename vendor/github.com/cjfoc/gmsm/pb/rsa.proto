@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+/*
+rsa非对称密钥操作
+*/
+package pb;
+
+
+message RsaGenerateRequest {
+   bool ephemeral=1;
+}
+
+message RsaGenerateResponse {
+  bytes label=1;
+  bytes D=2;
+  bytes Prime=3;
+  bytes Exponent=4;
+  bytes N=5;
+  int64 E=6;
+}
+
+message RsaSignRequest {
+  bytes label=1;
+  bytes msg =2;
+}
+
+message RsaSignResponse {
+  bytes dst =1;
+}
+
+message RsaVerifyRequest {
+  bytes label=1;
+  bytes msg =2;
+  bytes dst =3;
+}
+
+message RsaVerifyResponse {
+  bool valid =1;
+}
+
+message RsaEncryptRequest {
+  bytes label=1;
+  bytes msg =2;
+}
+
+message RsaEncryptResponse {
+  bytes dst =1;
+}
+
+message RsaDecryptRequest {
+  bytes label=1;
+  bytes msg =2;
+}
+
+message RsaDecryptResponse {
+  bytes dst =1;
+}
+
+message RsaPublicKeyRequest {
+  bytes label=1;
+}
+
+message RsaPublicKeyResponse {
+  bytes N=1;
+  int64 E=2;
+}
+
+service RsaOperate {
+  rpc RsaGenerate(RsaGenerateRequest) returns (RsaGenerateResponse) {}
+  rpc RsaSignData(RsaSignRequest) returns (RsaSignResponse){}
+  rpc RsaEncryptData(RsaEncryptRequest) returns (RsaEncryptResponse){}
+  rpc RsaDecryptData(RsaDecryptRequest) returns (RsaDecryptResponse){}
+  rpc RsaVerifyData(RsaVerifyRequest) returns (RsaVerifyResponse){}
+  rpc RsaPublicKey(RsaPublicKeyRequest) returns(RsaPublicKeyResponse){}
+}

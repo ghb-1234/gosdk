@@ -30,6 +30,8 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+
+	"github.com/cjfoc/gmsm/sm2"
 )
 
 // struct to hold info required for PKCS#8
@@ -70,9 +72,9 @@ func oidFromNamedCurve(curve elliptic.Curve) (asn1.ObjectIdentifier, bool) {
 }
 
 // PrivateKeyToDER marshals a private key to der
-func PrivateKeyToDER(privateKey *ecdsa.PrivateKey) ([]byte, error) {
+func PrivateKeyToDER(privateKey *sm2.PrivateKey) ([]byte, error) {
 	if privateKey == nil {
-		return nil, errors.New("Invalid ecdsa private key. It must be different from nil.")
+		return nil, errors.New("Invalid sm2 private key. It must be different from nil.")
 	}
 
 	return x509.MarshalECPrivateKey(privateKey)
@@ -94,6 +96,50 @@ func PrivateKeyToPEM(privateKey interface{}, pwd []byte) ([]byte, error) {
 	case *ecdsa.PrivateKey:
 		if k == nil {
 			return nil, errors.New("Invalid ecdsa private key. It must be different from nil.")
+		}
+
+		// get the oid for the curve
+		oidNamedCurve, ok := oidFromNamedCurve(k.Curve)
+		if !ok {
+			return nil, errors.New("unknown elliptic curve")
+		}
+
+		// based on https://golang.org/src/crypto/x509/sec1.go
+		privateKeyBytes := k.D.Bytes()
+		paddedPrivateKey := make([]byte, (k.Curve.Params().N.BitLen()+7)/8)
+		copy(paddedPrivateKey[len(paddedPrivateKey)-len(privateKeyBytes):], privateKeyBytes)
+		// omit NamedCurveOID for compatibility as it's optional
+		asn1Bytes, err := asn1.Marshal(ecPrivateKey{
+			Version:    1,
+			PrivateKey: paddedPrivateKey,
+			PublicKey:  asn1.BitString{Bytes: elliptic.Marshal(k.Curve, k.X, k.Y)},
+		})
+
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling EC key to asn1 [%s]", err)
+		}
+
+		var pkcs8Key pkcs8Info
+		pkcs8Key.Version = 0
+		pkcs8Key.PrivateKeyAlgorithm = make([]asn1.ObjectIdentifier, 2)
+		pkcs8Key.PrivateKeyAlgorithm[0] = oidPublicKeyECDSA
+		pkcs8Key.PrivateKeyAlgorithm[1] = oidNamedCurve
+		pkcs8Key.PrivateKey = asn1Bytes
+
+		pkcs8Bytes, err := asn1.Marshal(pkcs8Key)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling EC key to asn1 [%s]", err)
+		}
+		return pem.EncodeToMemory(
+			&pem.Block{
+				Type:  "PRIVATE KEY",
+				Bytes: pkcs8Bytes,
+			},
+		), nil
+
+	case *sm2.PrivateKey:
+		if k == nil {
+			return nil, errors.New("Invalid sm2 private key. It must be different from nil.")
 		}
 
 		// get the oid for the curve
@@ -195,7 +241,7 @@ func DERToPrivateKey(der []byte) (key interface{}, err error) {
 
 	if key, err = x509.ParsePKCS8PrivateKey(der); err == nil {
 		switch key.(type) {
-		case *rsa.PrivateKey, *ecdsa.PrivateKey:
+		case *rsa.PrivateKey, *ecdsa.PrivateKey, *sm2.PrivateKey:
 			return
 		default:
 			return nil, errors.New("Found unknown private key type in PKCS#8 wrapping")
@@ -324,6 +370,21 @@ func PublicKeyToPEM(publicKey interface{}, pwd []byte) ([]byte, error) {
 				Bytes: PubASN1,
 			},
 		), nil
+	case *sm2.PublicKey:
+		if k == nil {
+			return nil, errors.New("Invalid sm2 public key. It must be different from nil.")
+		}
+		PubASN1, err := x509.MarshalPKIXPublicKey(k)
+		if err != nil {
+			return nil, err
+		}
+
+		return pem.EncodeToMemory(
+			&pem.Block{
+				Type:  "PUBLIC KEY",
+				Bytes: PubASN1,
+			},
+		), nil
 	case *rsa.PublicKey:
 		if k == nil {
 			return nil, errors.New("Invalid rsa public key. It must be different from nil.")
@@ -362,7 +423,16 @@ func PublicKeyToDER(publicKey interface{}) ([]byte, error) {
 		}
 
 		return PubASN1, nil
+	case *sm2.PublicKey:
+		if k == nil {
+			return nil, errors.New("Invalid sm2 public key. It must be different from nil.")
+		}
+		PubASN1, err := x509.MarshalPKIXPublicKey(k)
+		if err != nil {
+			return nil, err
+		}
 
+		return PubASN1, nil
 	case *rsa.PublicKey:
 		if k == nil {
 			return nil, errors.New("Invalid rsa public key. It must be different from nil.")

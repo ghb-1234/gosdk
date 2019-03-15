@@ -11,6 +11,7 @@ import (
 	"sync/atomic"
 
 	"github.com/pkg/errors"
+	"github.com/tjfoc/gmtls/gmcredentials"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/common/verifier"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/logging"
@@ -21,7 +22,6 @@ import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/core/config/comm"
 	"github.com/hyperledger/fabric-sdk-go/pkg/core/config/endpoint"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 )
 
 var logger = logging.NewLogger("fabsdk/fab")
@@ -132,7 +132,7 @@ func newDialOpts(config fab.EndpointConfig, url string, params *params) ([]grpc.
 			return verifier.VerifyPeerCertificate(rawCerts, verifiedChains)
 		}
 
-		dialOpts = append(dialOpts, grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)))
+		dialOpts = append(dialOpts, grpc.WithTransportCredentials(gmcredentials.NewTLS(tlsConfig)))
 		logger.Debugf("Creating a secure connection to [%s] with TLS HostOverride [%s]", url, params.hostOverride)
 	} else {
 		logger.Debugf("Creating an insecure connection [%s]", url)

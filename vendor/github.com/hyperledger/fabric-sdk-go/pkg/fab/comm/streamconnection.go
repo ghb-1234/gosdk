@@ -8,6 +8,7 @@ package comm
 
 import (
 	"sync"
+	"github.com/tjfoc/gmtls/gmcredentials"
 
 	"github.com/pkg/errors"
 
@@ -56,7 +57,7 @@ func NewStreamConnection(ctx fabcontext.Client, chConfig fab.ChannelCfg, streamP
 	}
 
 	if peer.AuthInfo != nil {
-		tlsInfo := peer.AuthInfo.(credentials.TLSInfo)
+		tlsInfo := peer.AuthInfo.(gmcredentials.TLSInfo)
 		for _, peercert := range tlsInfo.State.PeerCertificates {
 			err := verifier.ValidateCertificateDates(peercert)
 			if err != nil {

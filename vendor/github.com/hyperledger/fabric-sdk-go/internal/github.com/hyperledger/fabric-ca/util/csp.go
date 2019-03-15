@@ -148,8 +148,8 @@ func ImportBCCSPKeyFromPEMBytes(keyBuff []byte, myCSP core.CryptoSuite, temporar
 		return nil, errors.WithMessage(err, fmt.Sprintf("Failed parsing private key from %s", keyFile))
 	}
 	switch key.(type) {
-	case *ecdsa.PrivateKey:
-		priv, err := factory.PrivateKeyToDER(key.(*ecdsa.PrivateKey))
+	case *sm2.PrivateKey:
+		priv, err := factory.PrivateKeyToDER(key.(*sm2.PrivateKey))
 		if err != nil {
 			return nil, errors.WithMessage(err, fmt.Sprintf("Failed to convert ECDSA private key for '%s'", keyFile))
 		}

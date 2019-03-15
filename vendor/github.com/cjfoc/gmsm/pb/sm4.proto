@@ -1,0 +1,41 @@
+syntax = "proto3";
+  
+/*
+sm4对称密钥操作
+*/
+
+package pb;
+
+message Sm4GenerateRequest {
+   bool ephemeral=1;
+}
+
+message Sm4GenerateResponse {
+  bytes label=1;
+  bytes value=2;
+}
+
+message Sm4EncryptRequest {
+  bytes label=1;
+  bytes msg =2;
+}
+
+message Sm4EncryptResponse {
+  bytes dst =1;
+}
+
+message Sm4DecryptRequest {
+  bytes label=1;
+  bytes msg =2;
+}
+
+message Sm4DecryptResponse {
+  bytes dst =1;
+}
+
+service Sm4Operate {
+  rpc Sm4Generate(Sm4GenerateRequest) returns (Sm4GenerateResponse) {}
+  rpc Sm4EncryptData(Sm4EncryptRequest) returns (Sm4EncryptResponse){}
+  rpc Sm4DecryptData(Sm4DecryptRequest) returns (Sm4DecryptResponse){}
+  rpc Sm4Key(Sm4GenerateRequest) returns(Sm4GenerateResponse){}
+}

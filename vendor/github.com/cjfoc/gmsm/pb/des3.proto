@@ -1,0 +1,41 @@
+syntax = "proto3";
+  
+/*
+des3对称密钥操作
+*/
+
+package pb;
+
+message Des3GenerateRequest {
+   bool ephemeral=1;
+}
+
+message Des3GenerateResponse {
+  bytes label=1;
+  bytes value=2;
+}
+
+message Des3EncryptRequest {
+  bytes label=1;
+  bytes msg =2;
+}
+
+message Des3EncryptResponse {
+  bytes dst =1;
+}
+
+message Des3DecryptRequest {
+  bytes label=1;
+  bytes msg =2;
+}
+
+message Des3DecryptResponse {
+  bytes dst =1;
+}
+
+service Des3Operate {
+  rpc Des3Generate(Des3GenerateRequest) returns (Des3GenerateResponse) {}
+  rpc Des3EncryptData(Des3EncryptRequest) returns (Des3EncryptResponse){}
+  rpc Des3DecryptData(Des3DecryptRequest) returns (Des3DecryptResponse){}
+  rpc Des3Key(Des3GenerateRequest) returns(Des3GenerateResponse){}
+}

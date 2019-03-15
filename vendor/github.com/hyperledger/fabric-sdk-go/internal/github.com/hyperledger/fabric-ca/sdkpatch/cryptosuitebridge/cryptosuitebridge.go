@@ -12,8 +12,8 @@ package cryptosuitebridge
 
 import (
 	"crypto"
-	"crypto/ecdsa"
 
+	"github.com/cjfoc/gmsm/sm2"
 	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/bccsp"
 	cspsigner "github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/bccsp/signer"
 	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/bccsp/utils"
@@ -45,6 +45,10 @@ const (
 	SHA3_256         = bccsp.SHA3_256
 	SHA3_384         = bccsp.SHA3_384
 	X509Certificate  = bccsp.X509Certificate
+
+	SM2 = bccsp.SM2
+	SM3 = bccsp.SM3
+	SM4 = bccsp.SM4
 )
 
 // NewCspSigner is a bridge for bccsp signer.New call
@@ -58,7 +62,7 @@ func PEMtoPrivateKey(raw []byte, pwd []byte) (interface{}, error) {
 }
 
 // PrivateKeyToDER marshals is bridge for utils.PrivateKeyToDER
-func PrivateKeyToDER(privateKey *ecdsa.PrivateKey) ([]byte, error) {
+func PrivateKeyToDER(privateKey *sm2.PrivateKey) ([]byte, error) {
 	return utils.PrivateKeyToDER(privateKey)
 }
 
@@ -115,5 +119,5 @@ func GetX509PublicKeyImportOpts(ephemeral bool) core.KeyImportOpts {
 //GetECDSAPrivateKeyImportOpts options for ECDSA secret key importation in DER format
 // or PKCS#8 format.
 func GetECDSAPrivateKeyImportOpts(ephemeral bool) core.KeyImportOpts {
-	return &bccsp.ECDSAPrivateKeyImportOpts{Temporary: ephemeral}
+	return &bccsp.SM2PrivateKeyImportOpts{Temporary: ephemeral}
 }
