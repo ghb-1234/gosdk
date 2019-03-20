@@ -29,8 +29,8 @@ import (
 	"strings"
 	"time"
 
-	x509 "github.com/cjfoc/gmx509"
 	"github.com/cjfoc/gmsm/sm2"
+	x509 "github.com/cjfoc/gmx509"
 )
 
 var (

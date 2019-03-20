@@ -21,10 +21,10 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/bccsp"
-	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/bccsp/utils"
 	"github.com/cjfoc/gmsm/sm2"
 	x509 "github.com/cjfoc/gmx509"
+	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/bccsp"
+	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/bccsp/utils"
 )
 
 //实现内部的 KeyImporter 接口

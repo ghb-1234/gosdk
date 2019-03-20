@@ -26,11 +26,11 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/cjfoc/gmsm/sm2"
+	x509 "github.com/cjfoc/gmx509"
 	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/bccsp"
 	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/bccsp/utils"
-	"github.com/cjfoc/gmsm/sm2"
 	"github.com/tjfoc/gmsm/sm4"
-	x509 "github.com/cjfoc/gmx509"
 )
 
 // NewFileBasedKeyStore instantiated a file-based key store at a given position.
@@ -211,7 +211,7 @@ func (ks *fileBasedKeyStore) searchKeystoreForSKI(ski []byte) (k bccsp.Key, err 
 			continue
 		}
 
-		key, err := utils.PEMtoPrivateKey(raw, ks.pwd)
+		key, lab, err := PEMtoPrivateKey(raw)
 		if err != nil {
 			continue
 		}

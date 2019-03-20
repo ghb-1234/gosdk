@@ -22,11 +22,11 @@ import (
 	"net"
 	"strings"
 
-	"github.com/cjfoc/gmsm/sm2"
 	"github.com/cjfoc/gmtls"
 
 	"google.golang.org/grpc/credentials"
 
+	x509 "github.com/cjfoc/gmx509"
 	"golang.org/x/net/context"
 )
 
@@ -154,7 +154,7 @@ func NewTLS(c *gmtls.Config) credentials.TransportCredentials {
 // NewClientTLSFromCert constructs TLS credentials from the input certificate for client.
 // serverNameOverride is for testing only. If set to a non empty string,
 // it will override the virtual host name of authority (e.g. :authority header field) in requests.
-func NewClientTLSFromCert(cp *sm2.CertPool, serverNameOverride string) credentials.TransportCredentials {
+func NewClientTLSFromCert(cp *x509.CertPool, serverNameOverride string) credentials.TransportCredentials {
 	return NewTLS(&gmtls.Config{ServerName: serverNameOverride, RootCAs: cp})
 }
 
@@ -166,7 +166,7 @@ func NewClientTLSFromFile(certFile, serverNameOverride string) (credentials.Tran
 	if err != nil {
 		return nil, err
 	}
-	cp := sm2.NewCertPool()
+	cp := x509.NewCertPool()
 	if !cp.AppendCertsFromPEM(b) {
 		return nil, fmt.Errorf("credentials: failed to append certificates")
 	}

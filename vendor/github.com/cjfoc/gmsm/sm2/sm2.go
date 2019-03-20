@@ -10,6 +10,7 @@ import (
 
 	"github.com/cjfoc/gmsm"
 	"github.com/cjfoc/gmsm/pb"
+	"github.com/pkg/errors"
 )
 
 var (
@@ -135,4 +136,33 @@ func Encrypt(pub *PublicKey, data []byte) ([]byte, error) {
 func Decrypt(priv *PrivateKey, data []byte) ([]byte, error) {
 
 	return nil, nil
+}
+
+func GetPublicKey(label []byte) (*PublicKey, error) {
+
+	conn, err := gmsm.NewGrpcConn()
+	if err != nil {
+		return nil, fmt.Errorf("grpc newGrpcConn [%s]", err.Error())
+	}
+
+	defer conn.Close()
+
+	client := pb.NewSm2OperateClient(conn)
+
+	//生成key
+	req := pb.Sm2PublicKeyRequest{Label: label}
+	genRes, err := client.Sm2PublicKey(context.Background(), &req)
+	if err != nil {
+		return nil, errors.WithMessage(err, "grpc [Sm2PublicKey]")
+	}
+
+	pub := &PublicKey{
+		Curve:     P256Sm2(),
+		X:         new(big.Int).SetBytes(genRes.X),
+		Y:         new(big.Int).SetBytes(genRes.Y),
+		Label:     label,
+		Sensitive: true,
+	}
+
+	return pub, nil
 }
